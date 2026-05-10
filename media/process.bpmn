@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_SeasonDashboard" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.44.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:collaboration id="Collaboration_SeasonMenu">
+    <bpmn:participant id="Participant_Chef" name="Шеф-повар" />
+    <bpmn:participant id="Participant_Catalog" name="Каталог svoe-rodnoe.ru" />
+    <bpmn:participant id="Participant_Service" name="Сервис дашборда сезонности" processRef="Process_SeasonDashboard" />
+    <bpmn:messageFlow id="MF_ChefStart" name="Открывает дашборд" sourceRef="Participant_Chef" targetRef="StartEvent_OpenDashboard" />
+    <bpmn:messageFlow id="MF_RequestCatalog" name="Запрос продуктов (сезон + кухня)" sourceRef="Task_RequestCatalog" targetRef="Participant_Catalog" />
+    <bpmn:messageFlow id="MF_CatalogResponse" name="Список продуктов" sourceRef="Participant_Catalog" targetRef="CatchEvent_CatalogResponse" />
+    <bpmn:messageFlow id="Flow_09mdxy6" sourceRef="Event_17wu3vu" targetRef="Participant_Chef" />
+    <bpmn:messageFlow id="Flow_09qlhdm" sourceRef="Event_17wu3vu" targetRef="Participant_Chef" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_SeasonDashboard" name="Планирование сезонного меню" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_OpenDashboard" name="Шеф открывает&#10;дашборд сезонности">
+      <bpmn:outgoing>Flow_Start_CheckMenu</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Start" messageRef="Message_ChefOpen" />
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="GW_MenuLoaded" name="Меню уже загружено?">
+      <bpmn:incoming>Flow_Start_CheckMenu</bpmn:incoming>
+      <bpmn:outgoing>Flow_MenuYes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_MenuNo</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_ParseMenu" name="Парсинг меню&#10;(извлечение блюд)">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="parse_menu" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Upload_Parse</bpmn:incoming>
+      <bpmn:outgoing>Flow_Parse_Classify</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_ClassifyCuisine" name="Классификация типа кухни">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="classify_cuisine" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Parse_Classify</bpmn:incoming>
+      <bpmn:outgoing>Flow_Classify_GW</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="GW_Confidence" name="Уверенность&#10;классификации &#62; 70%?">
+      <bpmn:incoming>Flow_Classify_GW</bpmn:incoming>
+      <bpmn:outgoing>Flow_ConfidenceYes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ConfidenceNo</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="GW_CuisineJoin">
+      <bpmn:incoming>Flow_ConfidenceYes</bpmn:incoming>
+      <bpmn:incoming>Flow_Manual_Join</bpmn:incoming>
+      <bpmn:incoming>Flow_MenuYes</bpmn:incoming>
+      <bpmn:outgoing>Flow_Join_DetectSeason</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_DetectSeason" name="Определение текущего сезона">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="detect_current_season" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Join_DetectSeason</bpmn:incoming>
+      <bpmn:outgoing>Flow_Season_Request</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_RequestCatalog" name="Запрос к API svoe-rodnoe.ru">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="request_catalog_api" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Season_Request</bpmn:incoming>
+      <bpmn:outgoing>Flow_Request_GW</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="GW_ApiAvailable" name="API svoe-rodnoe.ru&#10;доступен?">
+      <bpmn:incoming>Flow_Request_GW</bpmn:incoming>
+      <bpmn:outgoing>Flow_ApiOk</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="CatchEvent_CatalogResponse" name="Получение списка продуктов&#10;от каталога">
+      <bpmn:incoming>Flow_ApiOk</bpmn:incoming>
+      <bpmn:outgoing>Flow_CatalogOk_Join</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_CatalogResponse" messageRef="Message_CatalogData" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Task_LoadCache" name="Загрузка кэша продуктов&#10;+ уведомление">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="load_cache_fallback" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ApiError_Cache</bpmn:incoming>
+      <bpmn:outgoing>Flow_Cache_Join</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="GW_DataJoin">
+      <bpmn:incoming>Flow_CatalogOk_Join</bpmn:incoming>
+      <bpmn:incoming>Flow_Cache_Join</bpmn:incoming>
+      <bpmn:outgoing>Flow_DataJoin_Rank</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_RankProducts" name="Ранжирование продуктов">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="rank_products" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_DataJoin_Rank</bpmn:incoming>
+      <bpmn:outgoing>Flow_Rank_AI</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_GenerateExplanations" name="Генерация AI-объяснений&#10;совместимости">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="generate_ai_explanations" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Rank_AI</bpmn:incoming>
+      <bpmn:outgoing>Flow_16yrrzq</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_17wu3vu">
+      <bpmn:incoming>Flow_16yrrzq</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_14wbpzg" />
+    </bpmn:endEvent>
+    <bpmn:userTask id="Task_UploadMenu" name="Загрузка меню&#10;(PDF или текст)">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_MenuNo</bpmn:incoming>
+      <bpmn:outgoing>Flow_Upload_Parse</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_ManualCuisine" name="Выбор типа кухни&#10;вручную">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ConfidenceNo</bpmn:incoming>
+      <bpmn:outgoing>Flow_Manual_Join</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="BoundaryEvent_ApiError" name="API недоступен" attachedToRef="Task_RequestCatalog">
+      <bpmn:outgoing>Flow_ApiError_Cache</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="EED_ApiError" errorRef="Error_ApiUnavailable" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_Start_CheckMenu" sourceRef="StartEvent_OpenDashboard" targetRef="GW_MenuLoaded" />
+    <bpmn:sequenceFlow id="Flow_MenuYes" name="Да" sourceRef="GW_MenuLoaded" targetRef="GW_CuisineJoin">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=menuLoaded</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_MenuNo" name="Нет" sourceRef="GW_MenuLoaded" targetRef="Task_UploadMenu">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=not(menuLoaded)</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Upload_Parse" sourceRef="Task_UploadMenu" targetRef="Task_ParseMenu" />
+    <bpmn:sequenceFlow id="Flow_Parse_Classify" sourceRef="Task_ParseMenu" targetRef="Task_ClassifyCuisine" />
+    <bpmn:sequenceFlow id="Flow_Classify_GW" sourceRef="Task_ClassifyCuisine" targetRef="GW_Confidence" />
+    <bpmn:sequenceFlow id="Flow_ConfidenceYes" name="Да" sourceRef="GW_Confidence" targetRef="GW_CuisineJoin">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=cuisineConfidence &gt;= 0.7</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_ConfidenceNo" name="Нет" sourceRef="GW_Confidence" targetRef="Task_ManualCuisine">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=cuisineConfidence &lt; 0.7</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Manual_Join" sourceRef="Task_ManualCuisine" targetRef="GW_CuisineJoin" />
+    <bpmn:sequenceFlow id="Flow_Join_DetectSeason" sourceRef="GW_CuisineJoin" targetRef="Task_DetectSeason" />
+    <bpmn:sequenceFlow id="Flow_Season_Request" sourceRef="Task_DetectSeason" targetRef="Task_RequestCatalog" />
+    <bpmn:sequenceFlow id="Flow_Request_GW" sourceRef="Task_RequestCatalog" targetRef="GW_ApiAvailable" />
+    <bpmn:sequenceFlow id="Flow_ApiOk" sourceRef="GW_ApiAvailable" targetRef="CatchEvent_CatalogResponse" />
+    <bpmn:sequenceFlow id="Flow_CatalogOk_Join" sourceRef="CatchEvent_CatalogResponse" targetRef="GW_DataJoin" />
+    <bpmn:sequenceFlow id="Flow_ApiError_Cache" sourceRef="BoundaryEvent_ApiError" targetRef="Task_LoadCache" />
+    <bpmn:sequenceFlow id="Flow_Cache_Join" sourceRef="Task_LoadCache" targetRef="GW_DataJoin" />
+    <bpmn:sequenceFlow id="Flow_DataJoin_Rank" sourceRef="GW_DataJoin" targetRef="Task_RankProducts" />
+    <bpmn:sequenceFlow id="Flow_Rank_AI" sourceRef="Task_RankProducts" targetRef="Task_GenerateExplanations" />
+    <bpmn:sequenceFlow id="Flow_16yrrzq" sourceRef="Task_GenerateExplanations" targetRef="Event_17wu3vu" />
+  </bpmn:process>
+  <bpmn:message id="Message_ChefOpen" name="ChefOpensDashboard" />
+  <bpmn:message id="Message_CatalogData" name="CatalogProductsResponse">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=1" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_DashboardReady" name="DashboardReadyForChef" />
+  <bpmn:error id="Error_ApiUnavailable" name="ApiUnavailableError" errorCode="API_UNAVAILABLE" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_SeasonMenu">
+      <bpmndi:BPMNShape id="Shape_Service" bpmnElement="Participant_Service" isHorizontal="true">
+        <dc:Bounds x="160" y="190" width="2060" height="560" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Start" bpmnElement="StartEvent_OpenDashboard">
+        <dc:Bounds x="242" y="432" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="220" y="475" width="82" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_MenuLoaded" bpmnElement="GW_MenuLoaded" isMarkerVisible="true">
+        <dc:Bounds x="335" y="425" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="331" y="482" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ParseMenu" bpmnElement="Task_ParseMenu">
+        <dc:Bounds x="590" y="310" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ClassifyCuisine" bpmnElement="Task_ClassifyCuisine">
+        <dc:Bounds x="740" y="310" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Confidence" bpmnElement="GW_Confidence" isMarkerVisible="true">
+        <dc:Bounds x="895" y="325" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="880" y="382" width="80" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_CuisineJoin" bpmnElement="GW_CuisineJoin" isMarkerVisible="true">
+        <dc:Bounds x="1155" y="425" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DetectSeason" bpmnElement="Task_DetectSeason">
+        <dc:Bounds x="1260" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_RequestCatalog" bpmnElement="Task_RequestCatalog">
+        <dc:Bounds x="1410" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_ApiAvailable" bpmnElement="GW_ApiAvailable" isMarkerVisible="true">
+        <dc:Bounds x="1565" y="425" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1565" y="382" width="52" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CatalogResponse" bpmnElement="CatchEvent_CatalogResponse">
+        <dc:Bounds x="1672" y="432" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1645" y="382" width="90" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LoadCache" bpmnElement="Task_LoadCache">
+        <dc:Bounds x="1560" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_DataJoin" bpmnElement="GW_DataJoin" isMarkerVisible="true">
+        <dc:Bounds x="1725" y="425" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_RankProducts" bpmnElement="Task_RankProducts">
+        <dc:Bounds x="1830" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GenerateExpl" bpmnElement="Task_GenerateExplanations">
+        <dc:Bounds x="1980" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1mxgfzc_di" bpmnElement="Event_17wu3vu">
+        <dc:Bounds x="2132" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zr66gi_di" bpmnElement="Task_UploadMenu">
+        <dc:Bounds x="440" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0q9i4xw_di" bpmnElement="Task_ManualCuisine">
+        <dc:Bounds x="1000" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ApiError" bpmnElement="BoundaryEvent_ApiError">
+        <dc:Bounds x="1472" y="472" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1516" y="483" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Start_CheckMenu" bpmnElement="Flow_Start_CheckMenu">
+        <di:waypoint x="278" y="450" />
+        <di:waypoint x="335" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MenuYes" bpmnElement="Flow_MenuYes">
+        <di:waypoint x="385" y="450" />
+        <di:waypoint x="1155" y="450" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="413" y="432" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MenuNo" bpmnElement="Flow_MenuNo">
+        <di:waypoint x="360" y="425" />
+        <di:waypoint x="360" y="350" />
+        <di:waypoint x="440" y="350" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="365" y="385" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Upload_Parse" bpmnElement="Flow_Upload_Parse">
+        <di:waypoint x="540" y="350" />
+        <di:waypoint x="590" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Parse_Classify" bpmnElement="Flow_Parse_Classify">
+        <di:waypoint x="690" y="350" />
+        <di:waypoint x="740" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Classify_GW" bpmnElement="Flow_Classify_GW">
+        <di:waypoint x="840" y="350" />
+        <di:waypoint x="895" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ConfidenceYes" bpmnElement="Flow_ConfidenceYes">
+        <di:waypoint x="945" y="350" />
+        <di:waypoint x="1180" y="350" />
+        <di:waypoint x="1180" y="425" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="963" y="332" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ConfidenceNo" bpmnElement="Flow_ConfidenceNo">
+        <di:waypoint x="920" y="325" />
+        <di:waypoint x="920" y="290" />
+        <di:waypoint x="1000" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="925" y="307" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Manual_Join" bpmnElement="Flow_Manual_Join">
+        <di:waypoint x="1100" y="290" />
+        <di:waypoint x="1180" y="290" />
+        <di:waypoint x="1180" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Join_DetectSeason" bpmnElement="Flow_Join_DetectSeason">
+        <di:waypoint x="1205" y="450" />
+        <di:waypoint x="1260" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Season_Request" bpmnElement="Flow_Season_Request">
+        <di:waypoint x="1360" y="450" />
+        <di:waypoint x="1410" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Request_GW" bpmnElement="Flow_Request_GW">
+        <di:waypoint x="1510" y="450" />
+        <di:waypoint x="1565" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ApiOk" bpmnElement="Flow_ApiOk">
+        <di:waypoint x="1615" y="450" />
+        <di:waypoint x="1672" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ApiError_Cache" bpmnElement="Flow_ApiError_Cache">
+        <di:waypoint x="1490" y="508" />
+        <di:waypoint x="1490" y="600" />
+        <di:waypoint x="1560" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_CatalogOk_Join" bpmnElement="Flow_CatalogOk_Join">
+        <di:waypoint x="1708" y="450" />
+        <di:waypoint x="1725" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Cache_Join" bpmnElement="Flow_Cache_Join">
+        <di:waypoint x="1660" y="600" />
+        <di:waypoint x="1750" y="600" />
+        <di:waypoint x="1750" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DataJoin_Rank" bpmnElement="Flow_DataJoin_Rank">
+        <di:waypoint x="1775" y="450" />
+        <di:waypoint x="1830" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Rank_AI" bpmnElement="Flow_Rank_AI">
+        <di:waypoint x="1930" y="450" />
+        <di:waypoint x="1980" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16yrrzq_di" bpmnElement="Flow_16yrrzq">
+        <di:waypoint x="2080" y="450" />
+        <di:waypoint x="2132" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Shape_Catalog" bpmnElement="Participant_Catalog" isHorizontal="true">
+        <dc:Bounds x="160" y="810" width="2060" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Chef" bpmnElement="Participant_Chef" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2060" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_MF_ChefStart" bpmnElement="MF_ChefStart">
+        <di:waypoint x="260" y="140" />
+        <di:waypoint x="260" y="432" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="271" y="283" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF_RequestCatalog" bpmnElement="MF_RequestCatalog">
+        <di:waypoint x="1460" y="490" />
+        <di:waypoint x="1460" y="810" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1470" y="630" width="87" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF_CatalogResponse" bpmnElement="MF_CatalogResponse">
+        <di:waypoint x="1690" y="810" />
+        <di:waypoint x="1690" y="468" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1712" y="628" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09mdxy6_di" bpmnElement="Flow_09mdxy6">
+        <di:waypoint x="2150" y="432" />
+        <di:waypoint x="2150" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09qlhdm_di" bpmnElement="Flow_09qlhdm">
+        <di:waypoint x="2150" y="432" />
+        <di:waypoint x="2150" y="140" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
