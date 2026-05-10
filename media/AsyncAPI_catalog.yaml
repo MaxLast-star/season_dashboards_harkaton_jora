@@ -1,0 +1,62 @@
+asyncapi: 2.6.0
+info:
+  title: Svoe-Shef Catalog Sync
+  version: 1.0.0
+
+channels:
+  catalog/sync/started:
+    subscribe:
+      summary: Запуск синхронизации каталога
+      message:
+        payload:
+          type: object
+          properties:
+            job_id:
+              type: string
+            started_at:
+              type: string
+              format: date-time
+            source:
+              type: string
+              example: "svoe-rodnoe.ru"
+
+  catalog/sync/completed:
+    subscribe:
+      summary: Завершение синхронизации каталога
+      message:
+        payload:
+          type: object
+          properties:
+            job_id:
+              type: string
+            completed_at:
+              type: string
+              format: date-time
+            stats:
+              type: object
+              properties:
+                total_fetched:
+                  type: integer
+                updated:
+                  type: integer
+                created:
+                  type: integer
+                errors:
+                  type: integer
+            status:
+              type: string
+              enum: [success, partial_failure, failure]
+
+  catalog/sync/failed:
+    subscribe:
+      summary: Ошибка синхронизации
+      message:
+        payload:
+          type: object
+          properties:
+            job_id:
+              type: string
+            error:
+              type: string
+            retry_count:
+              type: integer

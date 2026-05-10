@@ -39,74 +39,11 @@
 
 ---
 
-### 1.4 Контракт (AsyncAPI YAML)
+Контракт AsyncAPI находится в файле `AsyncAPI_catalog.yaml` в папке `media`
 
-```yaml
-asyncapi: 2.6.0
-info:
-  title: Svoe-Shef Catalog Sync
-  version: 1.0.0
 
-channels:
-  catalog/sync/started:
-    subscribe:
-      summary: Запуск синхронизации каталога
-      message:
-        payload:
-          type: object
-          properties:
-            job_id:
-              type: string
-            started_at:
-              type: string
-              format: date-time
-            source:
-              type: string
-              example: "svoe-rodnoe.ru"
 
-  catalog/sync/completed:
-    subscribe:
-      summary: Завершение синхронизации каталога
-      message:
-        payload:
-          type: object
-          properties:
-            job_id:
-              type: string
-            completed_at:
-              type: string
-              format: date-time
-            stats:
-              type: object
-              properties:
-                total_fetched:
-                  type: integer
-                updated:
-                  type: integer
-                created:
-                  type: integer
-                errors:
-                  type: integer
-            status:
-              type: string
-              enum: [success, partial_failure, failure]
-
-  catalog/sync/failed:
-    subscribe:
-      summary: Ошибка синхронизации
-      message:
-        payload:
-          type: object
-          properties:
-            job_id:
-              type: string
-            error:
-              type: string
-            retry_count:
-              type: integer
-```
-
-### 1.5 Сценарии работы и краевые случаи
+### 1.4 Сценарии работы и краевые случаи
 
 | Сценарий | Поведение |
 |---|---|
@@ -155,61 +92,9 @@ channels:
 
 Обоснование: Для хакатона и MVP достаточно прямого запроса с кэшированием. Время ответа 1–3 сек приемлемо, если показать skeleton/spinner. Кэш Redis по ключу `{product_id}:{cuisine_type}` с TTL 1ч гарантирует, что повторный запрос вернёт результат за <10мс. В v2.0 — переход на SSE для streaming-отображения генерации.
 
-### 2.4 Контракт
+Контракт AsyncAPI находится в файле `AsyncAPI_gen_ii.yaml` в папке `media`
 
-```yaml
-asyncapi: 2.6.0
-info:
-  title: AI Explanation Generation
-  version: 1.0.0
-
-channels:
-  ai/explanation/requested:
-    subscribe:
-      summary: Запрос на генерацию объяснения
-      message:
-        payload:
-          type: object
-          required: [product_id, cuisine_type, restaurant_id]
-          properties:
-            request_id:
-              type: string
-            product_id:
-              type: string
-            cuisine_type:
-              type: string
-            restaurant_id:
-              type: string
-            requested_at:
-              type: string
-              format: date-time
-
-  ai/explanation/completed:
-    subscribe:
-      summary: Объяснение сгенерировано
-      message:
-        payload:
-          type: object
-          properties:
-            request_id:
-              type: string
-            product_id:
-              type: string
-            cuisine_type:
-              type: string
-            explanation:
-              type: string
-            source:
-              type: string
-              enum: [cache, generated]
-            generated_at:
-              type: string
-              format: date-time
-            ttl_seconds:
-              type: integer
-```
-
-### 2.5 Краевые случаи
+### 2.4 Краевые случаи
 
 | Сценарий | Поведение |
 |---|---|
@@ -239,15 +124,15 @@ channels:
 
 ```json
 {
-  "event_type": "product_viewed",
-  "restaurant_id": "rest_789",
-  "user_id": "user_456",
-  "product_id": "prod_123",
-  "session_id": "sess_abc",
-  "timestamp": "2025-09-01T12:30:00Z",
+  "event_type": "string",
+  "restaurant_id": "string",
+  "user_id": "string",
+  "product_id": "string",
+  "session_id": "string",
+  "timestamp": "datetime",
   "metadata": {
-    "source_screen": "dashboard",
-    "filter_applied": "mushrooms"
+    "source_screen": "string",
+    "filter_applied": "string"
   }
 }
 ```

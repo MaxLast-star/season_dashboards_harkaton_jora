@@ -1,0 +1,49 @@
+asyncapi: 2.6.0
+info:
+  title: AI Explanation Generation
+  version: 1.0.0
+
+channels:
+  ai/explanation/requested:
+    subscribe:
+      summary: Запрос на генерацию объяснения
+      message:
+        payload:
+          type: object
+          required: [product_id, cuisine_type, restaurant_id]
+          properties:
+            request_id:
+              type: string
+            product_id:
+              type: string
+            cuisine_type:
+              type: string
+            restaurant_id:
+              type: string
+            requested_at:
+              type: string
+              format: date-time
+
+  ai/explanation/completed:
+    subscribe:
+      summary: Объяснение сгенерировано
+      message:
+        payload:
+          type: object
+          properties:
+            request_id:
+              type: string
+            product_id:
+              type: string
+            cuisine_type:
+              type: string
+            explanation:
+              type: string
+            source:
+              type: string
+              enum: [cache, generated]
+            generated_at:
+              type: string
+              format: date-time
+            ttl_seconds:
+              type: integer

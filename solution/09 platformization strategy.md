@@ -101,6 +101,6 @@
 
 | Этап | Срок | Архитектурное изменение |
 |---|---|---|
-| **MVP** | Хакатон | Monolith, Supabase/Neon, Upstash Redis |
+| **MVP** | 1-2 мес. | Monolith, Supabase/Neon, Upstash Redis |
 | **v2.0** | 2-4 мес. | Выделение AI-сервиса, Celery для фоновых задач, CDN для изображений |
 | **v3.0** | 4-6 мес. | ClickHouse для аналитики, мобильное приложение, интеграция с POS (iiko/r_keeper) |
