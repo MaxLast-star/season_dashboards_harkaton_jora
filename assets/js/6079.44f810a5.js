@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksvoe_shef_docs=self.webpackChunksvoe_shef_docs||[]).push([["6079"],{26402(e,s,c){c.d(s,{createArchitectureServices:()=>h.S});var h=c(45016);c(46921)}}]);
