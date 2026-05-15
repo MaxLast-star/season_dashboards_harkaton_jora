@@ -17,12 +17,15 @@
 
 ### Описание экранов
 
+
 **S-01 Онбординг / Загрузка меню**
 - Drag-and-drop зона для PDF или поле вставки текста
 - Кнопка "Выбрать тип кухни вручную"
 - Выпадающий список типов кухонь (из справочника)
 - Индикатор прогресса обработки
 - Кнопка "Перейти к дашборду"
+
+![onboarding](../media/onboarding.png)
 
 **S-02 Дашборд сезонности**
 - Заголовок с текущим месяцем и сезоном
@@ -32,11 +35,15 @@
 - Блок "Рекомендации к обновлению меню" (топ-5 продуктов)
 - Кнопка "Корзина" с бейджем количества товаров
 
+![dasboard](../media/dashboard.png)
+
 **S-03 Каталог продуктов**
 - Карточки продуктов (фото, название, категория, статус сезонности, бейджи, имя фермера)
 - Сортировка: по сезону / по категории / по статусу
 - Фильтры: категория, регион, статус, тип
 - Кнопка "В корзину" на каждой карточке
+
+![catalog](../media/catalog.png)
 
 **S-04 Детальная карточка продукта**
 - Фото, название, категория, регион
@@ -46,6 +53,8 @@
 - Блок "Можно использовать в блюдах": список блюд из меню шефа
 - Кнопка "Перейти к фермеру" (svoe-rodnoe.ru, новая вкладка)
 - Кнопка "Добавить в корзину"
+- 
+![product](../media/product.png)
 
 **S-05 Профиль ресторана**
 - Название ресторана, тип кухни (редактируемый)
@@ -53,12 +62,16 @@
 - История просмотренных продуктов
 - Кнопка "Обновить меню"
 
+![profile](../media/profile.png)
+
 **S-06 Корзина / Оформление заказа**
 - Список добавленных продуктов: фото, название, фермер, количество, цена
 - Возможность изменить количество или удалить позицию
 - Группировка по фермерам
 - Итоговая сумма
 - Кнопка "Оформить заказ"
+
+![cart](../media/cart.png)
 
 ---
 
@@ -149,7 +162,7 @@
     "end_month": "integer",
     "is_year_round": "boolean"
   },
-  "seasonality_status": "enum(IN_SEASON, NOT_IN_SEASON)",
+  "seasonality_status": "enum(IN_SEASON, ENDING_SOON, STARTING_SOON, OUT_OF_SEASON)",
   "badges": ["string"],
   "farmer": {
     "id": "string",
@@ -210,7 +223,7 @@
 {
   "product_id": "string",
   "product_name": "string",
-  "seasonality_status": "enum(IN_SEASON, NOT_IN_SEASON)",
+  "seasonality_status": "enum(IN_SEASON, ENDING_SOON, STARTING_SOON, OUT_OF_SEASON)",
   "ai_explanation": "string",
   "menu_matches": [
     {
@@ -239,7 +252,7 @@
           "product_id": "string",
           "name": "string",
           "category": "string",
-          "status": "enum(IN_SEASON, NOT_IN_SEASON)",
+          "status": "enum(IN_SEASON, ENDING_SOON, STARTING_SOON, OUT_OF_SEASON)",
           "badges": ["string"]
         }
       ]
