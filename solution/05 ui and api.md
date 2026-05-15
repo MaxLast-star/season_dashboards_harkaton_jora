@@ -312,34 +312,3 @@
   "updated_at": "datetime"
 }
 ```
-
-
-В файле `api.yaml` в папке `media` находится описание api контракта
-
-
-## 6. Примечание по Figma
-
-Для отрисовки UI-макетов в Figma используйте плагин **[Figma MCP](https://www.figma.com/community/plugin/figma-mcp)** или **Figma Dev Mode**.
-
-Чтобы подключить Figma к Claude через MCP, необходимо:
-1. Открыть Claude Desktop -> Settings -> Developer -> Edit Config
-2. Добавить в `claude_desktop_config.json`:
-```json
-{
-  "mcpServers": {
-    "figma": {
-      "command": "npx",
-      "args": ["-y", "figma-mcp"],
-      "env": {
-        "FIGMA_API_KEY": "ВАШ_FIGMA_API_KEY"
-      }
-    }
-  }
-}
-```
-3. Получить API-ключ в Figma: Account Settings -> Security -> Personal access tokens
-4. Перезапустить Claude Desktop
-
-После подключения можно передавать ссылку на фрейм Figma и Claude сможет читать/описывать макеты. Самостоятельно рисовать в Figma через MCP Claude не умеет — MCP предоставляет read-доступ к существующим файлам.
-
-Для создания макетов рекомендуется использовать **Figma AI** (встроен в Figma) или описать экраны команде дизайна на основе описаний S-01...S-06 из раздела 1 этого файла.

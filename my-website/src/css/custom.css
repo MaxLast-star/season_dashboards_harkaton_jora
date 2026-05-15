@@ -1,0 +1,167 @@
+/**
+ * Своё Шеф — Docusaurus theme
+ * Цветовая схема: зелёный акцент (#3B6D11) под UI дашборда
+ */
+
+:root {
+  --ifm-color-primary: #3B6D11;
+  --ifm-color-primary-dark: #336010;
+  --ifm-color-primary-darker: #2f5a0e;
+  --ifm-color-primary-darkest: #264a0b;
+  --ifm-color-primary-light: #437a13;
+  --ifm-color-primary-lighter: #4a8715;
+  --ifm-color-primary-lightest: #5a9e1a;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(59, 109, 17, 0.1);
+  --ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --ifm-navbar-height: 56px;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #97C459;
+  --ifm-color-primary-dark: #88ba47;
+  --ifm-color-primary-darker: #80b340;
+  --ifm-color-primary-darkest: #6a9535;
+  --ifm-color-primary-light: #a1ca6a;
+  --ifm-color-primary-lighter: #a9cf75;
+  --ifm-color-primary-lightest: #beda96;
+  --docusaurus-highlighted-code-line-bg: rgba(151, 196, 89, 0.15);
+}
+
+/* Navbar */
+.navbar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: none;
+}
+
+.navbar__title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Sidebar */
+.menu__link {
+  border-radius: 8px;
+  font-size: 13.5px;
+}
+
+.menu__link--active {
+  background: #EAF3DE;
+  color: #3B6D11;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .menu__link--active {
+  background: rgba(151, 196, 89, 0.15);
+  color: #97C459;
+}
+
+.menu__caret::before {
+  background: var(--ifm-color-primary);
+}
+
+/* Article */
+.markdown h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  border-bottom: 2px solid #EAF3DE;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.markdown h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  color: #3B6D11;
+}
+
+[data-theme='dark'] .markdown h2 {
+  color: #97C459;
+}
+
+.markdown h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Tables */
+table {
+  display: table;
+  width: 100%;
+  font-size: 13.5px;
+  border-collapse: collapse;
+}
+
+thead tr {
+  background: #EAF3DE;
+}
+
+[data-theme='dark'] thead tr {
+  background: rgba(151, 196, 89, 0.12);
+}
+
+th {
+  font-weight: 600;
+  color: #3B6D11;
+}
+
+[data-theme='dark'] th {
+  color: #97C459;
+}
+
+tr:nth-child(even) {
+  background: rgba(59, 109, 17, 0.03);
+}
+
+/* Code blocks */
+pre {
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+/* Admonition tweaks */
+.admonition {
+  border-radius: 10px;
+}
+
+/* Breadcrumbs */
+.breadcrumbs__item--active .breadcrumbs__link {
+  color: #3B6D11;
+  font-weight: 500;
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Hero on intro page */
+.hero-svoe {
+  background: linear-gradient(135deg, #EAF3DE 0%, #f5f9ee 100%);
+  border-radius: 16px;
+  padding: 40px 48px;
+  margin-bottom: 32px;
+  border: 1px solid #C0DD97;
+}
+
+.hero-svoe h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a18;
+  border: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+.hero-svoe p {
+  font-size: 15px;
+  color: #3B6D11;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Badge chips in md */
+.badge-g { display: inline-block; background: #EAF3DE; color: #3B6D11; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.badge-a { display: inline-block; background: #FAEEDA; color: #854F0B; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.badge-r { display: inline-block; background: #FCEBEB; color: #A32D2D; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
