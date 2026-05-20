@@ -298,13 +298,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
               <tbody>
                 <tr class="tl-cat"><td colspan="5">🥬 Овощи</td></tr>
                 <tr class="tl-row"><td>Молодой шпинат</td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-r">К</span></td><td class="sc"><span class="bdg bg-g">Сейчас</span></td></tr>
-                <tr class="tl-row"><td>Редис</td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-r">К</span></td><td class="sc"><span class="sd sd-n">—</span></td><td class="sc"><span class="bdg bg-a">Заканчивается</span></td></tr>
+                <tr class="tl-row"><td>Редис</td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-r">К</span></td><td class="sc"><span class="sd sd-n">—</span></td><td class="sc"><span class="bdg bg-r">Заканчивается</span></td></tr>
                 <tr class="tl-row"><td>Кабачок</td><td class="sc"><span class="sd sd-a">С</span></td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="bdg bg-a">Скоро</span></td></tr>
                 <tr class="tl-cat"><td colspan="5">🫐 Ягоды</td></tr>
                 <tr class="tl-row"><td>Земляника <span class="bdg bg-p" style="font-size:9px">Редкая</span></td><td class="sc"><span class="sd sd-a">С</span></td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="bdg bg-a">Скоро</span></td></tr>
-                <tr class="tl-row"><td>Клубника <span class="bdg bg-b" style="font-size:9px">Премиум</span></td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-r">К</span></td><td class="sc"><span class="sd sd-n">—</span></td><td class="sc"><span class="bdg bg-a">Заканчивается</span></td></tr>
+                <tr class="tl-row"><td>Клубника <span class="bdg bg-b" style="font-size:9px">Премиум</span></td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-r">К</span></td><td class="sc"><span class="sd sd-n">—</span></td><td class="sc"><span class="bdg bg-r">Заканчивается</span></td></tr>
                 <tr class="tl-cat"><td colspan="5">🍄 Грибы</td></tr>
-                <tr class="tl-row"><td>Сморчок <span class="bdg bg-p" style="font-size:9px">Редкий</span></td><td class="sc"><span class="sd sd-r">К</span></td><td class="sc"><span class="sd sd-n">—</span></td><td class="sc"><span class="sd sd-n">—</span></td><td class="sc"><span class="bdg bg-a">Заканчивается</span></td></tr>
+                <tr class="tl-row"><td>Сморчок <span class="bdg bg-p" style="font-size:9px">Редкий</span></td><td class="sc"><span class="sd sd-r">К</span></td><td class="sc"><span class="sd sd-n">—</span></td><td class="sc"><span class="sd sd-n">—</span></td><td class="sc"><span class="bdg bg-r">Заканчивается</span></td></tr>
                 <tr class="tl-cat"><td colspan="5">🐟 Рыба</td></tr>
                 <tr class="tl-row"><td>Форель радужная <span class="bdg bg-b" style="font-size:9px">Премиум</span></td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-g">В</span></td><td class="sc"><span class="sd sd-a">С</span></td><td class="sc"><span class="bdg bg-g">Сейчас</span></td></tr>
               </tbody>
@@ -337,7 +337,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
     <div class="screen" id="s03">
       <div class="topbar"><div class="search-box"><i class="ti ti-search"></i><span>Поиск продукта...</span></div><div class="tb-r"><select style="font-size:11px;color:#6b6b67;border:1px solid rgba(0,0,0,.15);border-radius:8px;padding:5px 9px;background:#fff;cursor:pointer;font-family:inherit"><option>По сезону</option><option>По категории</option><option>По цене</option></select><button class="btn-o"><i class="ti ti-download"></i> Экспорт</button></div></div>
       <div style="background:#fff;border-bottom:1px solid rgba(0,0,0,.10);padding:9px 18px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0">
-        <span class="flbl">Сезон</span><span class="chip on">В сезоне</span><span class="chip on-am">Скоро</span><span class="chip">Заканчивается</span>
+        <span class="flbl">Сезон</span><span class="chip on">В сезоне</span><span class="chip on-am">Скоро</span><span class="chip on-red">Заканчивается</span>
         <span class="fsep"></span><span class="flbl">Группа</span><span class="chip on">Все</span><span class="chip">Овощи</span><span class="chip">Ягоды</span><span class="chip">Грибы</span><span class="chip">Рыба</span>
         <span class="fsep"></span><span class="flbl">Тип</span><span class="chip">Редкий</span><span class="chip">Премиум</span>
       </div>
@@ -458,7 +458,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
               <div class="card-hdr"><div class="card-title">История просмотров</div><div class="card-act" onclick="go('s03')">Все →</div></div>
               <div class="h-row" onclick="go('s04')" style="cursor:pointer"><div class="h-icon">🐟</div><div><div style="font-size:11px;font-weight:500;color:#1a1a18">Форель радужная</div><div style="font-size:10px;color:#9e9e99">Сегодня, 14:32</div></div><span class="bdg bg-g" style="margin-left:auto">В сезоне</span></div>
               <div class="h-row" onclick="go('s04')" style="cursor:pointer"><div class="h-icon">🌿</div><div><div style="font-size:11px;font-weight:500;color:#1a1a18">Шпинат молодой</div><div style="font-size:10px;color:#9e9e99">Вчера, 11:20</div></div><span class="bdg bg-g" style="margin-left:auto">В сезоне</span></div>
-              <div class="h-row" onclick="go('s04')" style="cursor:pointer"><div class="h-icon">🍄</div><div><div style="font-size:11px;font-weight:500;color:#1a1a18">Сморчок</div><div style="font-size:10px;color:#9e9e99">13 мая</div></div><span class="bdg bg-a" style="margin-left:auto">Заканчивается</span></div>
+              <div class="h-row" onclick="go('s04')" style="cursor:pointer"><div class="h-icon">🍄</div><div><div style="font-size:11px;font-weight:500;color:#1a1a18">Сморчок</div><div style="font-size:10px;color:#9e9e99">13 мая</div></div><span class="bdg bg-r" style="margin-left:auto">Заканчивается</span></div>
             </div>
           </div>
         </div>
